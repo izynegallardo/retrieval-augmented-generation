@@ -1,3 +1,9 @@
+*,
+::before,
+::after {
+    box-sizing: border-box;
+}
+
 :root {
     --text: #6b6375;
     --text-h: #08060d;
@@ -94,28 +100,35 @@ main {
     box-sizing: border-box;
 }
 
-section {
+.container {
+    flex: 1;
     display: flex;
-    flex-direction: column;
-    place-items: center;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+section {
+    padding: 1em;
+    width: 50%;
+    height: 100svh;
 }
 
 /* Master Layout Reset */
-#output {
+.output {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    text-align: left;
+    margin: 20px auto;
+    border-radius: 4px;
+    padding: 12px;
     width: 100%;
     max-width: 950px;
-    margin: 20px auto;
+    min-height: 500px;
     background-color: #1c1c1c;
     font-family: Consolas, Monaco, 'Lucida Console', monospace;
     font-size: 12px;
+    text-align: left;
     line-height: 1.5;
-    padding: 12px;
-    border-radius: 4px;
-    box-sizing: border-box;
 }
 
 .console-master,
@@ -195,4 +208,30 @@ details[open] > summary::before {
 .property,
 .property-length {
     padding-left: 4px;
+}
+
+.similarity-item {
+    background-color: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 12px;
+    margin: 8px 0;
+    text-align: left;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.similarity-score {
+    color: var(--accent);
+    font-family: var(--mono);
+    font-weight: bold;
+    font-size: 13px;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.similarity-content {
+    color: var(--text-h);
+    margin: 0;
+    font-size: 15px;
 }

@@ -1,13 +1,15 @@
-import { main } from './index'
+import { generateAndStoreEmbeddings } from './generate'
+import { searchSimilarity } from './query'
 import sampleData from '../data/sample_content'
 
-export async function render() {
+export async function renderVectorEmbeddings() {
+    const outputVectorEmbeddingContainer = document.getElementById('output-vector-embeddings')
+
     try {
-        const embeddings = await main(sampleData)
+        const embeddings = await generateAndStoreEmbeddings(sampleData)
         if (!embeddings) return
 
-        const outputContainer = document.getElementById('output')
-        outputContainer.innerHTML = ''
+        outputVectorEmbeddingContainer.innerHTML = ''
 
         // 1. Create a Master Details wrapper for the entire Array
         const masterDetails = document.createElement('details')
@@ -29,7 +31,7 @@ export async function render() {
             itemDetails.className = 'console-item'
 
             const previewText =
-                item.context.length > 45 ? `${item.context.slice(0, 45)}...` : item.context
+                item.content.length > 45 ? `${item.content.slice(0, 45)}...` : item.content
             const fullEmbedding = item.embedding || []
 
             // 3. Dynamically slice embedding arrays into interactive 100-item chunks
@@ -64,12 +66,12 @@ export async function render() {
                 <summary>
                     <span class="index">${index}:</span> 
                     <span class="bracket">{</span>
-                    <span class="key">context</span>: <span class="string">"${previewText}"</span>, 
+                    <span class="key">content</span>: <span class="string">"${previewText}"</span>, 
                     <span class="key">embedding</span>: <span class="type">Array(${fullEmbedding.length})</span>
                     <span class="bracket">}</span>
                 </summary>
                 <div class="console-content">
-                    <div class="property"><span class="key">context</span>: <span class="string">"${item.context}"</span></div>
+                    <div class="property"><span class="key">content</span>: <span class="string">"${item.content}"</span></div>
                     
                     <details class="console-array">
                         <summary><span class="key">embedding</span>: <span class="type">Array(${fullEmbedding.length})</span></summary>
@@ -83,10 +85,45 @@ export async function render() {
             contentContainer.appendChild(itemDetails)
         })
 
-        outputContainer.appendChild(masterDetails)
+        outputVectorEmbeddingContainer.appendChild(masterDetails)
     } catch (error) {
         console.error(error)
-        document.getElementById('output').innerHTML =
-            `<div class="error">Error: ${error.message}</div>`
+        outputVectorEmbeddingContainer.innerHTML = `<div class="error">Error: ${error.message}</div>`
+    }
+}
+
+export async function renderSearchSimilarity() {
+    const outputSearchSimilarityContainer = document.getElementById('output-search-similarity')
+
+    try {
+        const queryText = document.getElementById('user-input').value
+        if (!queryText.trim()) return
+
+        outputSearchSimilarityContainer.innerHTML = 'Searching...'
+
+        const matches = await searchSimilarity(queryText)
+
+        if (!matches || matches.length === 0) {
+            outputSearchSimilarityContainer.innerHTML = '<div>No similar documents found.</div>'
+            return
+        }
+
+        const htmlString = matches
+            .map((match) => {
+                const scorePercentage = (match.similarity * 100).toFixed(1)
+
+                return `
+                    <div class="similarity-item">
+                        <span class="similarity-score">[${match.similarity} - ${scorePercentage}% Match]</span>
+                        <p class="similarity-content">${match.content}</p>
+                    </div>
+                `
+            })
+            .join('')
+
+        outputSearchSimilarityContainer.innerHTML = htmlString
+    } catch (error) {
+        console.error(error)
+        outputSearchSimilarityContainer.innerHTML = `<div class="error">Error: ${error.message}</div>`
     }
 }
