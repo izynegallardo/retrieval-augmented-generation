@@ -3,7 +3,7 @@
 -- CREATE the documents Table
 create table documents (
   id bigserial primary key,
-  content text, -- corresponds to the "text chunk"
+  content text unique, -- corresponds to the "text chunk"
   embedding vector(2048) -- 2048 works for nvidia/nemotron-3-embed-1b:free embedding output
 );
 

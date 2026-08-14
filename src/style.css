@@ -89,28 +89,30 @@ p {
 
 #app,
 main {
-    width: 1126px;
-    max-width: 100%;
-    margin: 0 auto;
-    text-align: center;
-    border-inline: 1px solid var(--border);
-    min-height: 100svh;
     display: flex;
     flex-direction: column;
-    box-sizing: border-box;
+    margin: 0 auto;
+    border-inline: 1px solid var(--border);
+    width: 1126px;
+    max-width: 100%;
+    min-height: 100svh;
+    text-align: center;
 }
 
 .container {
-    flex: 1;
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-evenly;
-    align-items: center;
+    align-items: start;
+    gap: 0.5em;
+    width: 100%;
 }
 
 section {
-    padding: 1em;
-    width: 50%;
-    height: 100svh;
+    flex: 1 40%;
+    margin: 1em;
+    width: 100%;
+    min-height: 50svh;
 }
 
 /* Master Layout Reset */
@@ -123,7 +125,10 @@ section {
     padding: 12px;
     width: 100%;
     max-width: 950px;
-    min-height: 500px;
+    height: 100%;
+    min-height: 50svh;
+    overflow: auto;
+    scrollbar-width: thin;
     background-color: #1c1c1c;
     font-family: Consolas, Monaco, 'Lucida Console', monospace;
     font-size: 12px;
@@ -234,4 +239,62 @@ details[open] > summary::before {
     color: var(--text-h);
     margin: 0;
     font-size: 15px;
+}
+
+.chat {
+    align-items: end;
+    gap: 1em;
+    max-height: 600px;
+}
+
+.chat-messages {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    /* margin-top: auto; */
+    width: 100%;
+}
+
+.chat-input {
+    width: 100%;
+}
+
+.user-chat,
+.ai-reply {
+    display: flex;
+    border-radius: 8px;
+    padding: 1em;
+    width: 48%;
+    max-height: 300px;
+    overflow: auto;
+    scrollbar-width: thin;
+}
+
+.user-chat {
+    align-self: flex-end;
+    overflow-wrap: anywhere;
+    background-color: #2e303a;
+}
+
+.ai-reply {
+    align-self: flex-start;
+    overflow-wrap: break-word;
+    color: var(--accent);
+}
+
+.send-container {
+    position: sticky;
+    bottom: -12px;
+    display: flex;
+    justify-content: left;
+    gap: 0.5em;
+    margin-top: auto;
+    padding: 8px;
+    width: 100%;
+    background-color: #1c1c1c;
+}
+
+.send-btn {
+    border: 1px solid var(--accent);
+    background: var(--accent);
 }

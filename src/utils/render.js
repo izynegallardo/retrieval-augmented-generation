@@ -1,13 +1,20 @@
-import { generateAndStoreEmbeddings } from './generate'
-import { searchSimilarity } from './query'
+import { createEmbedding, storeEmbedding, getEmbeddings, getMatchDocuments } from '.'
 import sampleData from '../data/sample_content'
 
 export async function renderVectorEmbeddings() {
     const outputVectorEmbeddingContainer = document.getElementById('output-vector-embeddings')
 
     try {
-        const embeddings = await generateAndStoreEmbeddings(sampleData)
-        if (!embeddings) return
+        outputVectorEmbeddingContainer.innerHTML = 'Processing...'
+
+        const storeResult = await storeEmbedding(sampleData)
+        console.log(storeResult.message)
+
+        const embeddings = await getEmbeddings()
+        if (!embeddings.length) {
+            container.innerHTML = '<div>No embeddings found.</div>'
+            return
+        }
 
         outputVectorEmbeddingContainer.innerHTML = ''
 
@@ -32,28 +39,40 @@ export async function renderVectorEmbeddings() {
 
             const previewText =
                 item.content.length > 45 ? `${item.content.slice(0, 45)}...` : item.content
-            const fullEmbedding = item.embedding || []
 
-            // 3. Dynamically slice embedding arrays into interactive 100-item chunks
+            const fullEmbedding =
+                typeof item.embedding === 'string'
+                    ? JSON.parse(item.embedding)
+                    : item.embedding || []
+
             let chunksHTML = ''
             const chunkSize = 100
+
             for (let i = 0; i < fullEmbedding.length; i += chunkSize) {
                 const end = Math.min(i + chunkSize - 1, fullEmbedding.length - 1)
 
-                // Get slice values for inner display
                 const sliceData = fullEmbedding.slice(i, end + 1)
-                const valuesPreview =
-                    sliceData.slice(0, 3).join(', ') + (sliceData.length > 3 ? ', ...' : '')
 
                 chunksHTML += `
                     <details class="console-chunk">
-                        <summary class="chunk-title">[${i} … ${end}]</summary>
+                        <summary class="chunk-title">
+                            [${i} … ${end}]
+                        </summary>
+
                         <div class="chunk-values">
                             ${sliceData
                                 .map(
                                     (val, chunkIdx) => `
-                                <div class="property"><span class="index">${i + chunkIdx}:</span> <span class="number">${val}</span></div>
-                            `,
+                                        <div class="property">
+                                            <span class="index">
+                                                ${i + chunkIdx}:
+                                            </span>
+
+                                            <span class="number">
+                                                ${val}
+                                            </span>
+                                        </div>
+                                    `,
                                 )
                                 .join('')}
                         </div>
@@ -101,13 +120,14 @@ export async function renderSearchSimilarity() {
 
         outputSearchSimilarityContainer.innerHTML = 'Searching...'
 
-        const matches = await searchSimilarity(queryText)
+        const result = await createEmbedding(queryText)
+        const queryEmbedding = result[0].embedding
+        const matches = await getMatchDocuments(queryEmbedding)
 
-        if (!matches || matches.length === 0) {
+        if (!matches?.length) {
             outputSearchSimilarityContainer.innerHTML = '<div>No similar documents found.</div>'
             return
         }
-
         const htmlString = matches
             .map((match) => {
                 const scorePercentage = (match.similarity * 100).toFixed(1)
