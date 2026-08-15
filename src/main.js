@@ -1,5 +1,5 @@
 import './style.css'
-import { renderVectorEmbeddings, renderSearchSimilarity } from './utils/render'
+import { renderVectorEmbeddings, renderSearchSimilarity, renderChat } from './utils/render'
 
 document.querySelector('#app').innerHTML = `
   <main>
@@ -21,13 +21,11 @@ document.querySelector('#app').innerHTML = `
       <section>
         <h2>Chat</h2>
         <div id='output-chat' class='output chat'>
-          <div class='chat-messages'>
-            <div class='user-chat'>User chat</div>
-            <div class='ai-reply'>AI reply...</div>
-          </div>
+        <div id='opening-message' class='opening-message'>What podcast you want to listen today?</div>
+          <div id='chat-messages' class='chat-messages'></div>
           <div class='send-container'>
-              <input id='chat-input' class='chat-input' type='text' max=10 placeholder='Ask anything...'/>
-              <button id='send-btn' class='send-btn'>➤</button>
+              <input id='chat-input' class='chat-input' type='text' placeholder='Ask anything about podcast...'/>
+              <button id='message-btn' class='message-btn'>➤</button>
           </div>
         </div>
       </section>
@@ -36,3 +34,4 @@ document.querySelector('#app').innerHTML = `
 `
 document.getElementById('show').addEventListener('click', renderVectorEmbeddings)
 document.getElementById('query').addEventListener('click', renderSearchSimilarity)
+document.getElementById('message-btn').addEventListener('click', renderChat)

@@ -247,6 +247,14 @@ details[open] > summary::before {
     max-height: 600px;
 }
 
+.opening-message {
+    display: flex;
+    align-self: center;
+    margin: auto 0;
+    color: inherit;
+    font-size: 20px;
+}
+
 .chat-messages {
     display: flex;
     flex-direction: column;
@@ -266,8 +274,14 @@ details[open] > summary::before {
     padding: 1em;
     width: 48%;
     max-height: 300px;
-    overflow: auto;
+    overflow: hidden;
     scrollbar-width: thin;
+    scrollbar-gutter: stable;
+}
+
+.user-chat:hover,
+.ai-reply:hover {
+    overflow: auto;
 }
 
 .user-chat {
@@ -282,6 +296,48 @@ details[open] > summary::before {
     color: var(--accent);
 }
 
+.ai-reply.typing {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    min-width: 50px;
+    color: var(--accent);
+}
+
+.ai-reply .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background-color: var(--accent);
+    animation: typing 1.4s infinite ease-in-out;
+}
+
+.ai-reply .dot:nth-child(1) {
+    animation-delay: 0s;
+}
+
+.ai-reply .dot:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.ai-reply .dot:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes typing {
+    0%,
+    60%,
+    100% {
+        opacity: 0.3;
+        transform: translateY(0);
+    }
+
+    30% {
+        opacity: 1;
+        transform: translateY(-4px);
+    }
+}
+
 .send-container {
     position: sticky;
     bottom: -12px;
@@ -294,7 +350,7 @@ details[open] > summary::before {
     background-color: #1c1c1c;
 }
 
-.send-btn {
-    border: 1px solid var(--accent);
+.message-btn {
+    border: 1px solid var(--accent-border);
     background: var(--accent);
 }

@@ -144,13 +144,21 @@ async function getChatCompletion(text, query) {
     }
 }
 
-export async function processChat(text) {
+export async function processChat(query) {
     try {
-        const embedding = await createEmbedding(text)
-        const match = await getMatchDocuments(embedding)
-        const response = await getChatCompletion(match[0].content)
+        const embedding = await createEmbedding(query)
+        const matches = await getMatchDocuments(embedding[0].embedding)
+
+        if (!matches || matches.length === 0) {
+            return "Sorry, I don't know the answer."
+        }
+
+        const context = matches.map((match) => match.content).join('\n\n')
+        const response = await getChatCompletion(context, query)
+
         return response
     } catch (error) {
         console.error('Failed to process chat:', error)
+        throw error
     }
 }

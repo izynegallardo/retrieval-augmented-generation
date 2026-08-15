@@ -1,4 +1,4 @@
-import { createEmbedding, storeEmbedding, getEmbeddings, getMatchDocuments } from '.'
+import { createEmbedding, storeEmbedding, getEmbeddings, getMatchDocuments, processChat } from '.'
 import sampleData from '../data/sample_content'
 
 export async function renderVectorEmbeddings() {
@@ -145,5 +145,62 @@ export async function renderSearchSimilarity() {
     } catch (error) {
         console.error(error)
         outputSearchSimilarityContainer.innerHTML = `<div class="error">Error: ${error.message}</div>`
+    }
+}
+
+const messagesHistory = []
+
+export async function renderChat() {
+    const userInputEl = document.getElementById('chat-input')
+    const chatMessagesEl = document.getElementById('chat-messages')
+    const openingMessageEl = document.getElementById('opening-message')
+
+    const userMessage = userInputEl.value.trim()
+
+    if (!userMessage) return
+
+    const userMessageEl = document.createElement('div')
+    userMessageEl.classList.add('user-chat')
+    userMessageEl.textContent = userMessage
+
+    chatMessagesEl.appendChild(userMessageEl)
+
+    const aiMessageEl = document.createElement('div')
+    aiMessageEl.classList.add('ai-reply', 'typing')
+    aiMessageEl.innerHTML = `
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+    `
+
+    chatMessagesEl.appendChild(aiMessageEl)
+
+    openingMessageEl.innerHTML = ''
+
+    userInputEl.value = ''
+
+    messagesHistory.push({
+        role: 'user',
+        content: userMessage,
+    })
+
+    try {
+        const response = await processChat(userMessage, messagesHistory)
+
+        if (!response) throw new Error('No response received')
+
+        aiMessageEl.textContent = response
+
+        messagesHistory.push({
+            role: 'assistant',
+            content: response,
+        })
+    } catch (error) {
+        console.error(error)
+        aiMessageEl.classList.add('ai-reply')
+        aiMessageEl.textContent = `Error: ${error.message}`
+    } finally {
+        chatMessagesEl.appendChild(userMessageEl)
+        chatMessagesEl.appendChild(aiMessageEl)
     }
 }
