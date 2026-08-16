@@ -1,10 +1,10 @@
 # Retrieval-Augmented Generation (RAG)
 
-![Vite](https://img.shields.io/badge/Vite-8.2.0-646CFF?logo=vite&logoColor=white)
-![LangChain](https://img.shields.io/badge/LangChain-1.5.9-1C3C3C?logo=langchain&logoColor=white)
-![Supabase](https://img.shields.io/badge/Supabase-2.112.3-3ECF8E?logo=supabase&logoColor=white)
-![OpenAI SDK](https://img.shields.io/badge/OpenAI%20SDK-7.4.0-412991?logo=openai&logoColor=white)
-![License](https://img.shields.io/github/license/izynegallardo/retrieval-augmented-generation)
+![Vite](https://img.shields.io/badge/Vite-8.2.0-9547fd?logo=vite&logoColor=white)
+![LangChain](https://img.shields.io/badge/LangChain-1.5.9-7fc8ff?logo=langchain&logoColor=white)
+![Supabase](https://img.shields.io/badge/Supabase-2.112.3-3ecf8e?logo=supabase&logoColor=white)
+![OpenAI API](https://img.shields.io/badge/OpenAI%20API-7.4.0-0aa37f?logo=openai&logoColor=white)
+![License](https://img.shields.io/badge/license-MIT-750013.svg)
 
 A simple RAG (Retrieval-Augmented Generation) app built with Vite, LangChain, and Supabase. It embeds documents into a vector store and uses retrieved context to answer questions via a chat model.
 
