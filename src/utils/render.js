@@ -1,5 +1,20 @@
-import { createEmbedding, storeEmbedding, getEmbeddings, getMatchDocuments, processChat } from '.'
-import sampleData from '../data/sample_content'
+import { createStoreEmbedding, getEmbeddings, searchSimilarity, processChat, processChunk } from '.'
+
+const documents = ['movies.txt', 'podcasts.txt']
+
+export async function renderCreatedEmbeddings() {
+    const outputVectorEmbeddingContainer = document.getElementById('output-vector-embeddings')
+
+    try {
+        outputVectorEmbeddingContainer.innerHTML = 'Creating and storing...'
+        const embeddings = await createStoreEmbedding(documents)
+        console.log(embeddings)
+        outputVectorEmbeddingContainer.innerHTML = `<div class="success">${embeddings.message}</div>`
+    } catch (error) {
+        console.error(error)
+        outputVectorEmbeddingContainer.innerHTML = `<div class="error">Error: ${error.message}</div>`
+    }
+}
 
 export async function renderVectorEmbeddings() {
     const outputVectorEmbeddingContainer = document.getElementById('output-vector-embeddings')
@@ -7,12 +22,9 @@ export async function renderVectorEmbeddings() {
     try {
         outputVectorEmbeddingContainer.innerHTML = 'Processing...'
 
-        const storeResult = await storeEmbedding(sampleData)
-        console.log(storeResult.message)
-
-        const embeddings = await getEmbeddings()
-        if (!embeddings.length) {
-            container.innerHTML = '<div>No embeddings found.</div>'
+        const vectorEmbeddings = await getEmbeddings()
+        if (!vectorEmbeddings.length) {
+            outputVectorEmbeddingContainer.innerHTML = '<div>No embeddings found.</div>'
             return
         }
 
@@ -25,7 +37,7 @@ export async function renderVectorEmbeddings() {
         // The master summary acts as the root line: (10) [{...}, {...}]
         masterDetails.innerHTML = `
             <summary class="console-root">
-                (${embeddings.length}) [<span>{...}</span>, <span>{...}</span>]
+                (${vectorEmbeddings.length}) [<span>{...}</span>, <span>{...}</span>]
             </summary>
             <div class="master-content"></div>
         `
@@ -33,7 +45,7 @@ export async function renderVectorEmbeddings() {
         const contentContainer = masterDetails.querySelector('.master-content')
 
         // 2. Process each item inside the array
-        embeddings.forEach((item, index) => {
+        vectorEmbeddings.forEach((item, index) => {
             const itemDetails = document.createElement('details')
             itemDetails.className = 'console-item'
 
@@ -120,9 +132,8 @@ export async function renderSearchSimilarity() {
 
         outputSearchSimilarityContainer.innerHTML = 'Searching...'
 
-        const result = await createEmbedding(queryText)
-        const queryEmbedding = result[0].embedding
-        const matches = await getMatchDocuments(queryEmbedding)
+        const matches = await searchSimilarity(queryText)
+        console.log(matches)
 
         if (!matches?.length) {
             outputSearchSimilarityContainer.innerHTML = '<div>No similar documents found.</div>'
@@ -146,6 +157,135 @@ export async function renderSearchSimilarity() {
         console.error(error)
         outputSearchSimilarityContainer.innerHTML = `<div class="error">Error: ${error.message}</div>`
     }
+}
+
+export async function renderChunks() {
+    const outputChunkContainer = document.getElementById('output-chunk')
+
+    try {
+        outputChunkContainer.innerHTML = 'Processing...'
+
+        const chunks = await processChunk(documents)
+        console.log(chunks)
+
+        if (!chunks.length) {
+            outputChunkContainer.innerHTML = '<div>No chunks found.</div>'
+            return
+        }
+
+        outputChunkContainer.innerHTML = ''
+
+        // Master wrapper: (41) [{...}, {...}]
+        const masterDetails = document.createElement('details')
+        masterDetails.className = 'console-master'
+
+        masterDetails.innerHTML = `
+            <summary class="console-root">
+                (${chunks.length}) [
+                <span>{...}</span>,
+                <span>{...}</span>
+                ]
+            </summary>
+
+            <div class="master-content"></div>
+        `
+
+        const contentContainer = masterDetails.querySelector('.master-content')
+
+        chunks.forEach((chunk, index) => {
+            const itemDetails = document.createElement('details')
+            itemDetails.className = 'console-item'
+
+            const content = chunk.pageContent || ''
+
+            const previewText = content.length > 60 ? `${content.slice(0, 60)}...` : content
+
+            itemDetails.innerHTML = `
+        <summary>
+            <span class="index">${index}:</span>
+
+            <span class="bracket">{</span>
+
+            <span class="key">content</span>:
+            <span class="string">
+                "${escapeHTML(previewText)}"
+            </span>,
+
+            <span class="key">metadata</span>:
+            <span class="type">Object</span>
+
+            <span class="bracket">}</span>
+        </summary>
+
+        <div class="console-content">
+
+            <div class="property">
+                <span class="key">content</span>:
+                <span class="string">
+                    "${escapeHTML(content)}"
+                </span>
+            </div>
+
+            ${
+                chunk.metadata
+                    ? `
+                        <details class="console-array">
+                            <summary>
+                                <span class="key">metadata</span>:
+                                <span class="type">Object</span>
+                            </summary>
+
+                            <div class="array-chunks">
+                                ${Object.entries(chunk.metadata)
+                                    .map(
+                                        ([key, value]) => `
+                                            <div class="property">
+                                                <span class="key">
+                                                    ${escapeHTML(key)}
+                                                </span>:
+
+                                                <span class="string">
+                                                    ${escapeHTML(
+                                                        typeof value === 'object'
+                                                            ? JSON.stringify(value)
+                                                            : value,
+                                                    )}
+                                                </span>
+                                            </div>
+                                        `,
+                                    )
+                                    .join('')}
+                            </div>
+                        </details>
+                    `
+                    : ''
+            }
+
+        </div>
+    `
+
+            contentContainer.appendChild(itemDetails)
+        })
+
+        outputChunkContainer.appendChild(masterDetails)
+    } catch (error) {
+        console.error(error)
+
+        outputChunkContainer.innerHTML = `
+            <div class="error">
+                Error: ${error.message}
+            </div>
+        `
+    }
+}
+
+function escapeHTML(value) {
+    return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;')
 }
 
 const messagesHistory = []
@@ -175,7 +315,7 @@ export async function renderChat() {
 
     chatMessagesEl.appendChild(aiMessageEl)
 
-    openingMessageEl.innerHTML = ''
+    openingMessageEl.classList.add('hidden')
 
     userInputEl.value = ''
 
@@ -202,5 +342,6 @@ export async function renderChat() {
     } finally {
         chatMessagesEl.appendChild(userMessageEl)
         chatMessagesEl.appendChild(aiMessageEl)
+        aiMessageEl.classList.remove('typing')
     }
 }

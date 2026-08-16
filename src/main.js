@@ -1,13 +1,20 @@
 import './style.css'
-import { renderVectorEmbeddings, renderSearchSimilarity, renderChat } from './utils/render'
+import {
+    renderCreatedEmbeddings,
+    renderVectorEmbeddings,
+    renderSearchSimilarity,
+    renderChunks,
+    renderChat,
+} from './utils/render'
 
 document.querySelector('#app').innerHTML = `
   <main>
-    <h1>Vector Embeddings</h1>
+    <h1>Retrieval-augmented Generation <div>(RAG)</div></h1>
     <div class='container'>
       <section>
         <h2>Create and store vector embeddings</h2>
-        <button id='show'>Show vector embeddings</button>
+        <button id='store-btn' class='embedding-btn'>Create and Store vector embeddings</button>
+        <button id='embedding-btn' class='embedding-btn'>Show vector embeddings</button>
         <div id='output-vector-embeddings' class='output'></div>
       </section>
       <section>
@@ -19,12 +26,18 @@ document.querySelector('#app').innerHTML = `
         <div id='output-search-similarity' class='output'></div>
       </section>
       <section>
+        <h2>Text Chunking</h2>
+        <button id='chunk-btn'>Get chunk</button>
+        <div id='output-chunk' class='output'>
+        </div>
+      </section>
+      <section>
         <h2>Chat</h2>
         <div id='output-chat' class='output chat'>
-        <div id='opening-message' class='opening-message'>What podcast you want to listen today?</div>
+        <div id='opening-message' class='opening-message'>What's your mood today?</div>
           <div id='chat-messages' class='chat-messages'></div>
           <div class='send-container'>
-              <input id='chat-input' class='chat-input' type='text' placeholder='Ask anything about podcast...'/>
+              <input id='chat-input' class='chat-input' type='text' placeholder='Ask anything...'/>
               <button id='message-btn' class='message-btn'>➤</button>
           </div>
         </div>
@@ -32,6 +45,8 @@ document.querySelector('#app').innerHTML = `
     </div>
   </main>
 `
-document.getElementById('show').addEventListener('click', renderVectorEmbeddings)
+document.getElementById('store-btn').addEventListener('click', renderCreatedEmbeddings)
+document.getElementById('embedding-btn').addEventListener('click', renderVectorEmbeddings)
 document.getElementById('query').addEventListener('click', renderSearchSimilarity)
 document.getElementById('message-btn').addEventListener('click', renderChat)
+document.getElementById('chunk-btn').addEventListener('click', renderChunks)

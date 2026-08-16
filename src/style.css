@@ -66,19 +66,20 @@ h2 {
 }
 
 h1 {
+    margin: 32px 0;
     font-size: 56px;
     letter-spacing: -1.68px;
-    margin: 32px 0;
+    line-height: 118%;
     @media (max-width: 1024px) {
         font-size: 36px;
         margin: 20px 0;
     }
 }
 h2 {
+    margin: 0 0 8px;
     font-size: 24px;
     line-height: 118%;
     letter-spacing: -0.24px;
-    margin: 0 0 8px;
     @media (max-width: 1024px) {
         font-size: 20px;
     }
@@ -110,9 +111,15 @@ main {
 
 section {
     flex: 1 40%;
+    display: flex;
+    flex-direction: column;
     margin: 1em;
     width: 100%;
     min-height: 50svh;
+}
+
+.embedding-btn {
+    margin-bottom: 1em;
 }
 
 /* Master Layout Reset */
@@ -253,6 +260,11 @@ details[open] > summary::before {
     margin: auto 0;
     color: inherit;
     font-size: 20px;
+    text-align: center;
+}
+
+.opening-message.hidden {
+    display: none;
 }
 
 .chat-messages {
@@ -269,7 +281,6 @@ details[open] > summary::before {
 
 .user-chat,
 .ai-reply {
-    display: flex;
     border-radius: 8px;
     padding: 1em;
     width: 48%;
@@ -277,6 +288,10 @@ details[open] > summary::before {
     overflow: hidden;
     scrollbar-width: thin;
     scrollbar-gutter: stable;
+
+    @media (max-width: 720px) {
+        width: 100%;
+    }
 }
 
 .user-chat:hover,
